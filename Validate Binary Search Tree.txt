@@ -1,0 +1,27 @@
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution{
+public:
+    void DFS(TreeNode* root, vector<int> &DFSResult){
+        if(root == NULL) return;
+        DFS(root->left,DFSResult);
+        DFSResult.push_back(root->val);
+        DFS(root->right,DFSResult);
+    }
+    bool isValidBST(TreeNode* root){
+        if(root == NULL) return true;
+        vector<int> DFSResult;
+        DFS(root,DFSResult);
+        for(vector<int> :: iterator it = DFSResult.begin(); it != DFSResult.end()-1; it++){
+            if(*it >= *(it+1)) return false;
+        }
+        return true;
+    }
+};
