@@ -1,0 +1,47 @@
+class Solution{
+private:
+    list<string> candWordNL,candWord;
+public:
+    bool isMatch(string end, string word){
+        int diffNum = 0;
+        for(int i = 0; i < word.size(); i++){
+            if(end[i] != word[i]) diffNum++;
+        }
+        if(diffNum == 1) return true;
+        else return false;
+    }
+    int ladderLengthBFS(string end, unordered_set<string> &dict,
+                        int time, unordered_map<string,bool> &isVisit){
+        while(!candWord.empty()||!candWordNL.empty()){
+            if(candWord.empty()){
+                candWord = candWordNL;
+                time++;
+                candWordNL.clear();
+            }
+            string start = candWord.front();
+            candWord.pop_front();
+            for(int i = 0; i < start.size(); i++){
+                char pre = start[i];
+                for(char c = 'a'; c <= 'z'; c++){
+                    start[i] = c;
+                    if(dict.find(start) != dict.end() && isVisit[start] == 0){
+                        if(start == end) return time + 2;
+                        if(isMatch(end,start) && !(dict.find(end) != dict.end())) return time + 3;
+                        candWordNL.push_back(start);
+                        isVisit[start] = 1;
+                    }
+                }
+                start[i] = pre;
+            }
+        }
+        return 0;
+    }
+    int ladderLength(string start, string end, unordered_set<string> &dict){
+        unordered_map<string,bool> isVisit;
+        for(auto &x : dict){
+            isVisit.insert(make_pair(x,0));
+        }
+        candWord.push_back(start);
+        return ladderLengthBFS(end,dict,0,isVisit);
+    }
+};
