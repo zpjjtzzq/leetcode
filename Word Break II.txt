@@ -1,0 +1,80 @@
+struct TrieNode{
+    char val;
+    bool isEnd;
+    TrieNode* next[26] = {NULL};
+    TrieNode(char x) : val(x), isEnd(false) {}
+};
+
+class TrieTree{
+private:
+    TrieNode* root = new TrieNode('a');
+public:
+    void trieInsert(string word){
+        TrieNode* RootTemp = root;
+        for(int i = 0; i < word.size(); i++){
+            if(RootTemp->next[word[i]-'a'] == NULL){
+                RootTemp->next[word[i]-'a'] = new TrieNode(word[i]);
+                RootTemp = RootTemp->next[word[i]-'a'];
+            }
+            else{
+                RootTemp = RootTemp->next[word[i]-'a'];
+            }
+        }
+        RootTemp->isEnd = true;
+    }
+    void getSentense(vector<string>& result, string& sentense, string s){
+        string sentenseTemp = sentense;
+        sentense.push_back(' ');
+        TrieNode* RootTemp = root;
+        for(int i = 0; i < s.size(); i++){
+            if(RootTemp->next[s[i]-'a'] != NULL){
+                RootTemp = RootTemp->next[s[i]-'a'];
+                sentense.push_back(s[i]);
+                if(RootTemp->isEnd == true && i+1 != s.size()){
+                    getSentense(result,sentense,string(s,i+1,s.size()-i-1));
+                }
+                else if(RootTemp->isEnd == true && i+1 == s.size()){
+                        sentense.erase(sentense.begin());
+                        result.push_back(sentense);
+                     }
+            }
+            else{
+                sentense = sentenseTemp;
+                return;
+            }
+        }
+        sentense = sentenseTemp;
+    }
+};
+
+class Solution {
+public:
+    bool isBreak(string s, unordered_set<string> &dict){
+        if(dict.empty()) return false;
+        vector<bool> canBreak(s.size()+1,false);
+        canBreak[0] = true;
+        for(int i = 1; i <= s.size(); i++){
+            for(int j = i-1; j >= 0; j--){
+                if(canBreak[j] == true){
+                    if(dict.find(string(s,j,i-j)) != dict.end()){
+                        canBreak[i] = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return canBreak[s.size()];
+    }
+    vector<string> wordBreak(string s, unordered_set<string> &dict) {
+        vector<string>  result;
+        TrieTree        myTrieTree;
+        string          sentense;
+        if(isBreak(s,dict)){
+            for(auto& word : dict){
+                myTrieTree.trieInsert(word);
+            }
+            myTrieTree.getSentense(result, sentense, s);
+            return result;
+        }else return result;
+    }
+};
