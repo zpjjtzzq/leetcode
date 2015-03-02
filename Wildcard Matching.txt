@@ -1,0 +1,31 @@
+class Solution{
+public:
+    // this method is too slow
+    bool isMatchStr(string s, string p){
+        if(p[0] == '*'){
+            int j = 1;
+            while(p[j] == '*'){
+                j++;
+            }
+            for(int i = 0; i <= s.size(); i++){
+                if(isMatchStr(string(s,i,s.size()-i),string(p,j,p.size()-j))) return true;
+            }
+            return false;
+        }
+        if(s[0] == '\0' || p[0] == '\0') return s[0] == p[0];
+        if(s[0] == p[0] || p[0] == '?') return isMatchStr(string(s,1,s.size()-1),string(p,1,p.size()-1));
+        return false;
+    }
+    bool isMatch(const char *s, const char *p){
+        const char* start = NULL;
+        const char* ss = s;
+        while(*s){
+            if(*s == *p || *p == '?'){ s++; p++; continue;}
+            if(*p == '*'){start = p++; ss = s; continue;}
+            if(start){p = start+1; s = ++ss; continue;}
+            return false;
+        }
+        while(*p == '*') p++;
+        return !*p;
+    }
+};
