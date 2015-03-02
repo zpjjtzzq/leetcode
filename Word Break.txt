@@ -1,0 +1,64 @@
+struct TrieNode{
+    char val;
+    bool isEnd;
+    TrieNode* next[26] = {NULL};
+    TrieNode(char x) : val(x), isEnd(false) {}
+};
+
+class TrieTree{
+private:
+    TrieNode* root = new TrieNode('a');
+public:
+    void trieInsert(string word){
+        TrieNode* RootTemp = root;
+        for(int i = 0; i < word.size(); i++){
+            if(RootTemp->next[word[i]-'a'] == NULL){
+                RootTemp->next[word[i]-'a'] = new TrieNode(word[i]);
+                RootTemp = RootTemp->next[word[i]-'a'];
+            }
+            else{
+                RootTemp = RootTemp->next[word[i]-'a'];
+            }
+        }
+        RootTemp->isEnd = true;
+    }
+    bool canBreak(string s){
+        TrieNode* RootTemp = root;
+        for(int i = 0; i < s.size(); i++){
+            if(RootTemp->next[s[i]-'a'] != NULL){
+                RootTemp = RootTemp->next[s[i]-'a'];
+                if(RootTemp->isEnd == true){
+                    if(i+1 == s.size()) return true;
+                    if(canBreak(string(s,i+1,s.size()-i-1))) return true;
+                }
+            }else return false;
+        }
+        return false;
+    }
+    void show(){
+        while(root->isEnd == false){
+            for(int i = 0; i < 26; i++){
+                if(root->next[i] != NULL){
+                    root = root->next[i];
+                    cout << root->val << endl;
+                }
+            }
+        }
+    }
+};
+
+class Solution {
+public:
+    TrieTree MyTrieTree;
+    bool wordBreak(string s, unordered_set<string> &dict) {
+        for(auto& word : dict){
+            string wordtemp = word;
+            if(s[0] == s[1])
+            reverse(wordtemp.begin(),wordtemp.end());
+            MyTrieTree.trieInsert(wordtemp);
+        }
+        if(s[0] == s[1])
+        reverse(s.begin(),s.end());
+        return MyTrieTree.canBreak(s);
+    }
+};
