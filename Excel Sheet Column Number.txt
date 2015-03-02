@@ -1,0 +1,19 @@
+class Solution {
+public:
+    int titleToNumber(string s){
+        int result = 0;
+        unordered_map<char,int> ctn;
+        for(int i = 0; i < 26; i++){
+            ctn.insert(make_pair<char,int>('A'+i,i+1));
+        }
+        reverse(s.begin(),s.end());
+        for(int i = 0; i < s.size(); i++){
+            int temp = 1;
+            for(int j = 0; j < i; j++){
+                temp *= 26;
+            }
+            result = result + (temp * ctn[s[i]]);
+        }
+        return result;
+    }
+};
