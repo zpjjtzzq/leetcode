@@ -1,0 +1,84 @@
+class Solution{
+public:
+    vector<vector<string> > findLadders(string start, string end, unordered_set<string> &dict){
+        unordered_set<string> unVisited(dict);
+        unordered_set<string> visitedThisLev;
+        unordered_map<string, vector<string> > adjMap;
+        int curlen = 0;
+        bool found = false;
+        queue<string> levQueue;
+        vector<vector<string> > result;
+        unVisited.insert(end);
+
+        levQueue.push(start);
+        int curLev = 1;
+        int nextLev = 0;
+
+        for(auto &x : unVisited){
+            adjMap.insert(make_pair(x,vector<string>()));
+        }
+        unVisited.erase(start);
+
+        //BFS
+        while(!levQueue.empty()){
+            string curLadder = levQueue.front(); levQueue.pop();
+            for(auto& nextLadder : getNeighbors(curLadder,unVisited)){
+                if(visitedThisLev.insert(nextLadder).second){
+                    nextLev++;
+                    levQueue.push(nextLadder);
+                }
+                adjMap[nextLadder].push_back(curLadder);
+                if(nextLadder == end && !found){
+                    found = true;
+                    curlen += 2;
+                }
+            }
+
+            if(--curLev == 0){
+                if(found) break;
+                for(auto& x : visitedThisLev){
+                    unVisited.erase(x);
+                }
+                curLev = nextLev;
+                nextLev = 0;
+                curlen ++;
+            }
+        }
+        if(found){
+            vector<string> p;
+            p.push_back(end);
+            getLadders(start,end,p,result,curlen,adjMap);
+        }
+        return result;
+    }
+
+    vector<string> getNeighbors(string curLadder, unordered_set<string> &unVisited){
+        vector<string> result;
+        for(int i = 0; i < curLadder.size(); i++){
+            char pre = curLadder[i];
+            for(char c = 'a'; c <= 'z'; c++){
+                curLadder[i] = c;
+                if(unVisited.find(curLadder) != unVisited.end() && c != pre){
+                    result.push_back(curLadder);
+                }
+            }
+            curLadder[i] = pre;
+        }
+        return result;
+    }
+
+    void getLadders(string start, string end, vector<string> &p,
+                    vector<vector<string> > &result, int curLen,
+                    unordered_map<string, vector<string> > &adjMap){
+            if(start == end){
+                reverse(p.begin(),p.end());
+                result.push_back(p);
+                reverse(p.begin(),p.end());
+            }else if(curLen > 0)
+                for(auto& x : adjMap[end]){
+                    p.push_back(x);
+                    getLadders(start,x,p,result,curLen-1,adjMap);
+                    p.pop_back();
+                }
+         }
+};
